@@ -141,7 +141,39 @@ cd globevote
 
 # Install dependencies
 pnpm install
+
+# ── 🛠️ Development Workflow ───────────────────────────────────────────
+
+GlobeVote uses a **pnpm monorepo** structure. All commands should be run from the root directory.
+
+### 📋 Prerequisites
+- **Node.js**: v20 or higher
+- **pnpm**: v9 or v10
+- **PostgreSQL**: v15 or higher
+- **FFmpeg**: Required for voice features (converts audio formats for OpenAI)
+
+### 🔑 Local Environment Setup
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Update `.env` with your `DATABASE_URL` and `OPENAI_API_KEY`.
+
+### 🗄️ Database Initialization
+```bash
+# Generate and push schema to database
+pnpm --filter @workspace/db run push
+
+# Seed the database with initial data
+pnpm --filter @workspace/scripts run seed
 ```
+
+### 🚀 Running the Application
+You can run the full stack (API + Frontend) concurrently:
+```bash
+pnpm dev
+```
+*Note: Ensure the API starts first if running separately.*
 
 ### Environment Variables
 

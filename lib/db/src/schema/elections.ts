@@ -1,6 +1,6 @@
 import { pgTable, text, real, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const electionsTable = pgTable("elections", {
   id: text("id").primaryKey(),
