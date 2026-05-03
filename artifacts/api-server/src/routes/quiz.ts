@@ -71,7 +71,10 @@ router.post("/quiz/submit", async (req, res) => {
       .where(eq(quizQuestionsTable.id, questionId))
       .limit(1);
 
-    if (!question) return res.status(404).json({ error: "Question not found" });
+    if (!question) {
+      res.status(404).json({ error: "Question not found" });
+      return;
+    }
 
     const correct = selectedOption === question.correctOption;
     const baseXp = correct ? question.xpReward : 0;

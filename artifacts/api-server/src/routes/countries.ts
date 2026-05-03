@@ -38,7 +38,10 @@ router.get("/countries/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const [country] = await db.select().from(countriesTable).where(eq(countriesTable.id, id)).limit(1);
-    if (!country) return res.status(404).json({ error: "Country not found" });
+    if (!country) {
+      res.status(404).json({ error: "Country not found" });
+      return;
+    }
 
     res.json({
       ...country,

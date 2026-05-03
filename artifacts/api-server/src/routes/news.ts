@@ -41,7 +41,10 @@ router.get("/news/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const [article] = await db.select().from(newsTable).where(eq(newsTable.id, id)).limit(1);
-    if (!article) return res.status(404).json({ error: "Article not found" });
+    if (!article) {
+      res.status(404).json({ error: "Article not found" });
+      return;
+    }
 
     res.json({
       ...article,

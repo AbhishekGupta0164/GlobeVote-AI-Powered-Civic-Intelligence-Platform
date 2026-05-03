@@ -60,7 +60,10 @@ router.get("/elections/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const [election] = await db.select().from(electionsTable).where(eq(electionsTable.id, id)).limit(1);
-    if (!election) return res.status(404).json({ error: "Election not found" });
+    if (!election) {
+      res.status(404).json({ error: "Election not found" });
+      return;
+    }
 
     res.json({
       ...election,

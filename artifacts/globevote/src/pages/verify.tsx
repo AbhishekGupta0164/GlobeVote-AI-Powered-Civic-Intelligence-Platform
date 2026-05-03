@@ -18,22 +18,25 @@ export default function Verify() {
     verifyClaim.mutate({ data: { claim } });
   };
 
-  const getVerdictColor = (verdict: string) => {
-    switch(verdict) {
-      case 'true': return 'bg-emerald-500 text-white';
-      case 'mostly-true': return 'bg-emerald-400 text-white';
-      case 'mixed': return 'bg-amber-500 text-white';
-      case 'mostly-false': return 'bg-rose-500 text-white';
-      case 'false': return 'bg-rose-600 text-white';
-      default: return 'bg-slate-500 text-white';
-    }
-  };
+    const getVerdictColor = (verdict: string | boolean) => {
+      const v = String(verdict);
+      switch(v) {
+        case 'true': return 'bg-emerald-500 text-white';
+        case 'mostly-true': return 'bg-emerald-400 text-white';
+        case 'mixed': return 'bg-amber-500 text-white';
+        case 'mostly-false': return 'bg-rose-500 text-white';
+        case 'false': return 'bg-rose-600 text-white';
+        default: return 'bg-slate-500 text-white';
+      }
+    };
 
-  const getVerdictIcon = (verdict: string) => {
-    if (verdict.includes('true')) return <ShieldCheck className="h-5 w-5" />;
-    if (verdict.includes('false')) return <ShieldAlert className="h-5 w-5" />;
-    return <ShieldQuestion className="h-5 w-5" />;
-  };
+    const getVerdictIcon = (verdict: string | boolean) => {
+      const v = String(verdict);
+      if (v.includes('true')) return <ShieldCheck className="h-5 w-5" />;
+      if (v.includes('false')) return <ShieldAlert className="h-5 w-5" />;
+      return <ShieldQuestion className="h-5 w-5" />;
+    };
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
@@ -72,7 +75,7 @@ export default function Verify() {
             <div className="flex items-center gap-3 mb-2">
               <Badge className={`${getVerdictColor(verifyClaim.data.verdict)} hover:${getVerdictColor(verifyClaim.data.verdict)} border-none px-3 py-1 uppercase tracking-widest flex items-center gap-2`}>
                 {getVerdictIcon(verifyClaim.data.verdict)}
-                {verifyClaim.data.verdict.replace('-', ' ')}
+                {String(verifyClaim.data.verdict).replace('-', ' ')}
               </Badge>
               <span className="text-sm font-medium text-muted-foreground">Confidence: {verifyClaim.data.confidence}%</span>
             </div>
@@ -105,7 +108,7 @@ export default function Verify() {
                 <CardContent className="p-4 flex gap-4">
                   <div className="shrink-0">
                     <Badge className={`${getVerdictColor(item.verdict)} hover:${getVerdictColor(item.verdict)} border-none px-2 py-0.5 text-[10px] uppercase tracking-wider`}>
-                      {item.verdict.replace('-', ' ')}
+                      {String(item.verdict).replace('-', ' ')}
                     </Badge>
                   </div>
                   <div>

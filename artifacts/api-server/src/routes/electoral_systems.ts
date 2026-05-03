@@ -29,7 +29,10 @@ router.get("/electoral-systems/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const [system] = await db.select().from(electoralSystemsTable).where(eq(electoralSystemsTable.id, id)).limit(1);
-    if (!system) return res.status(404).json({ error: "Electoral system not found" });
+    if (!system) {
+      res.status(404).json({ error: "Electoral system not found" });
+      return;
+    }
 
     res.json({
       ...system,

@@ -429,12 +429,13 @@ export default function Home() {
             </div>
             <div className="space-y-3">
               {stats?.recentClaims?.slice(0, 4).map((claim, i) => {
+                const v = String(claim.verdict);
                 const verdictColor =
-                  claim.verdict === "true" ? "#10b981" :
-                  claim.verdict === "mostly-true" ? "#34d399" :
-                  claim.verdict === "mixed" ? "#f59e0b" :
-                  claim.verdict === "mostly-false" ? "#f43f5e" :
-                  claim.verdict === "false" ? "#e11d48" : "#6b7280";
+                  v === "true" ? "#10b981" :
+                  v === "mostly-true" ? "#34d399" :
+                  v === "mixed" ? "#f59e0b" :
+                  v === "mostly-false" ? "#f43f5e" :
+                  v === "false" ? "#e11d48" : "#6b7280";
                 return (
                   <motion.div
                     key={claim.id}
@@ -456,7 +457,7 @@ export default function Home() {
                         className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
                         style={{ background: `${verdictColor}22`, color: verdictColor, border: `1px solid ${verdictColor}44` }}
                       >
-                        {claim.verdict.replace("-", " ")}
+                        {String(claim.verdict).replace("-", " ")}
                       </span>
                     </div>
                     <p className="text-xs line-clamp-2" style={{ color: "rgba(255,255,255,0.35)" }}>{claim.explanation}</p>
