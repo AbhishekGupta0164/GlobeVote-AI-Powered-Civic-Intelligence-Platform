@@ -13,7 +13,6 @@ COPY lib/api-client-react/package.json      lib/api-client-react/
 COPY lib/db/package.json                    lib/db/
 COPY lib/integrations-openai-ai-server/package.json lib/integrations-openai-ai-server/
 COPY lib/integrations-openai-ai-react/package.json  lib/integrations-openai-ai-react/
-COPY lib/integrations/package.json          lib/integrations/
 COPY artifacts/api-server/package.json      artifacts/api-server/
 COPY artifacts/globevote/package.json       artifacts/globevote/
 COPY scripts/package.json                   scripts/
