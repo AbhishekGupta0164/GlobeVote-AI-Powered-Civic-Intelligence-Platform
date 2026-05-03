@@ -14,6 +14,8 @@ jobs:
           fetch-depth: 0
           lfs: true
       - name: Push to hub
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: hf upload abhishek0164/globevote . . --repo-type=space --token $HF_TOKEN --exclude ".git/*" ".github/*"
+        uses: huggingface/github-action@v2
+        with:
+          hf_token: ${{ secrets.HF_TOKEN }}
+          hf_repo_id: abhishek0164/globevote
+          repo_type: space
