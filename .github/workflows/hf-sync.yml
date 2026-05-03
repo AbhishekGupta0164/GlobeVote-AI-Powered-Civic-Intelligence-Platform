@@ -14,8 +14,9 @@ jobs:
           fetch-depth: 0
           lfs: true
       - name: Push to hub
-        uses: huggingface/github-action@v2
+        uses: huggingface/hub-sync@v1.0
         with:
+          github_repo_id: AbhishekGupta0164/GlobeVote-AI-Powered-Civic-Intelligence-Platform
+          huggingface_repo_id: abhishek0164/globevote
           hf_token: ${{ secrets.HF_TOKEN }}
-          hf_repo_id: abhishek0164/globevote
           repo_type: space
