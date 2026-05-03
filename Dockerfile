@@ -17,7 +17,7 @@ COPY artifacts/api-server/package.json      artifacts/api-server/
 COPY artifacts/globevote/package.json       artifacts/globevote/
 COPY scripts/package.json                   scripts/
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 # ── Copy full source ───────────────────────────────────────────────────────
 COPY . .
