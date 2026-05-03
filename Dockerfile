@@ -6,7 +6,6 @@ FROM node:20-slim
 RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables
-ENV NODE_ENV=production
 ENV PORT=7860
 
 # Install pnpm globally
@@ -34,6 +33,8 @@ RUN pnpm run build
 
 # Expose the Hugging Face space port
 EXPOSE 7860
+
+ENV NODE_ENV=production
 
 # Start the API server which now also serves the frontend
 CMD ["pnpm", "--filter", "@workspace/api-server", "run", "start"]
