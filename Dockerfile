@@ -12,18 +12,17 @@ ENV PORT=7860
 RUN npm install -g pnpm@10.28.0
 
 # Set up the working directory and user
-RUN useradd -m -u 1000 user
 WORKDIR /app
-RUN chown user:user /app
-USER user
+RUN chown node:node /app
+USER node
 
 # Copy configuration files first for better caching
-COPY --chown=user package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 
 # Copy all workspaces
-COPY --chown=user artifacts ./artifacts
-COPY --chown=user lib ./lib
-COPY --chown=user scripts ./scripts
+COPY --chown=node:node artifacts ./artifacts
+COPY --chown=node:node lib ./lib
+COPY --chown=node:node scripts ./scripts
 
 # Install dependencies (skipping dev dependencies)
 RUN pnpm install --frozen-lockfile
