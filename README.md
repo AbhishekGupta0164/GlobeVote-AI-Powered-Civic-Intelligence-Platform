@@ -1,3 +1,12 @@
+---
+title: GlobeVote Civic Intelligence
+emoji: 🌍
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+---
+
 # 🌐 GlobeVote — AI-Powered Civic Intelligence Platform
 
 <div align="center">
