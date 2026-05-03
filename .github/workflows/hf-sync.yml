@@ -13,9 +13,7 @@ jobs:
         with:
           fetch-depth: 0
           lfs: true
-      - name: Install dependencies
-        run: pip install -U "huggingface_hub[cli]"
       - name: Push to hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: huggingface-cli upload abhishek0164/globevote . . --repo-type=space --commit-message "Sync from GitHub" --exclude ".git/*" ".github/*"
+        run: hf upload abhishek0164/globevote . . --repo-type=space --token $HF_TOKEN --exclude ".git/*" ".github/*"
