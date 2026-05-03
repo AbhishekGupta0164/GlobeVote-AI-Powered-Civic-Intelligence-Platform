@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "TVAHWXyahJ1I7edCrrGyI"
+uri = "file://README.md"
+type = "text"
+title = "GlobeVote — GitHub README"

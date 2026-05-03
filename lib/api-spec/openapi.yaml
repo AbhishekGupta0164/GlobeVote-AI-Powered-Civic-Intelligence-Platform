@@ -1,0 +1,999 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: GlobeVote Civic Intelligence Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: countries
+    description: Countries and election systems
+  - name: elections
+    description: Upcoming and past elections
+  - name: electoral-systems
+    description: Electoral system explanations and simulations
+  - name: chat
+    description: AI civic assistant
+  - name: quiz
+    description: Civic knowledge quizzes and gamification
+  - name: claims
+    description: Misinformation claim verification
+  - name: news
+    description: Curated civic news
+  - name: progress
+    description: User progress and civic skill levels
+  - name: stats
+    description: Platform statistics and dashboard
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # COUNTRIES
+  /countries:
+    get:
+      operationId: listCountries
+      tags: [countries]
+      summary: List all countries with election info
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: region
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of countries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Country"
+
+  /countries/{id}:
+    get:
+      operationId: getCountry
+      tags: [countries]
+      summary: Get country details with voting guide
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Country detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CountryDetail"
+
+  # ELECTIONS
+  /elections:
+    get:
+      operationId: listElections
+      tags: [elections]
+      summary: List upcoming and recent elections
+      parameters:
+        - name: countryId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [upcoming, ongoing, completed]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: List of elections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Election"
+
+  /elections/{id}:
+    get:
+      operationId: getElection
+      tags: [elections]
+      summary: Get detailed election info and results
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Election detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectionDetail"
+
+  /elections/upcoming-summary:
+    get:
+      operationId: getUpcomingElectionsSummary
+      tags: [elections]
+      summary: Get summary of upcoming elections for dashboard
+      responses:
+        "200":
+          description: Upcoming elections summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpcomingElectionsSummary"
+
+  # ELECTORAL SYSTEMS
+  /electoral-systems:
+    get:
+      operationId: listElectoralSystems
+      tags: [electoral-systems]
+      summary: List all electoral systems with explanations
+      responses:
+        "200":
+          description: List of electoral systems
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ElectoralSystem"
+
+  /electoral-systems/{id}:
+    get:
+      operationId: getElectoralSystem
+      tags: [electoral-systems]
+      summary: Get detailed electoral system info
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Electoral system detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ElectoralSystemDetail"
+
+  /electoral-systems/simulate:
+    post:
+      operationId: simulateElection
+      tags: [electoral-systems]
+      summary: Simulate seat allocation with given vote shares
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimulationRequest"
+      responses:
+        "200":
+          description: Simulation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimulationResult"
+
+  # AI CHAT
+  /chat/ask:
+    post:
+      operationId: askCivicAssistant
+      tags: [chat]
+      summary: Ask the AI civic assistant a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
+  /chat/history:
+    get:
+      operationId: getChatHistory
+      tags: [chat]
+      summary: Get recent chat history
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Chat history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatMessage"
+
+  # QUIZ / GAMIFICATION
+  /quiz/questions:
+    get:
+      operationId: listQuizQuestions
+      tags: [quiz]
+      summary: Get quiz questions by category and difficulty
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [voting-basics, electoral-systems, civic-rights, world-elections, misinformation]
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [beginner, intermediate, expert]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Quiz questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/QuizQuestion"
+
+  /quiz/submit:
+    post:
+      operationId: submitQuizAnswer
+      tags: [quiz]
+      summary: Submit a quiz answer and get feedback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuizAnswerRequest"
+      responses:
+        "200":
+          description: Answer result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizAnswerResult"
+
+  /quiz/leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [quiz]
+      summary: Get top players leaderboard
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [daily, weekly, alltime]
+            default: weekly
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  # CLAIM VERIFICATION
+  /claims/verify:
+    post:
+      operationId: verifyClaim
+      tags: [claims]
+      summary: Verify a civic claim or piece of election information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimVerifyRequest"
+      responses:
+        "200":
+          description: Claim verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimVerifyResult"
+
+  /claims/recent:
+    get:
+      operationId: getRecentClaims
+      tags: [claims]
+      summary: Get recently verified claims
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Recent claims
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClaimVerifyResult"
+
+  # NEWS
+  /news:
+    get:
+      operationId: listNews
+      tags: [news]
+      summary: List curated civic news articles
+      parameters:
+        - name: countryId
+          in: query
+          schema:
+            type: string
+        - name: topic
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: News articles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NewsArticle"
+
+  /news/{id}:
+    get:
+      operationId: getNewsArticle
+      tags: [news]
+      summary: Get a specific news article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: News article
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewsArticle"
+
+  # USER PROGRESS
+  /progress/{sessionId}:
+    get:
+      operationId: getUserProgress
+      tags: [progress]
+      summary: Get user progress and civic skill level
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+
+  /progress/{sessionId}/achievements:
+    get:
+      operationId: getUserAchievements
+      tags: [progress]
+      summary: Get user achievements and badges
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User achievements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
+  # STATS
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get platform-wide stats for the homepage dashboard
+      responses:
+        "200":
+          description: Dashboard stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required: [status]
+
+    Country:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        code:
+          type: string
+        flag:
+          type: string
+        region:
+          type: string
+        electoralSystem:
+          type: string
+        nextElectionDate:
+          type: string
+          nullable: true
+        voterTurnout:
+          type: number
+          nullable: true
+        registeredVoters:
+          type: integer
+          nullable: true
+      required: [id, name, code, flag, region, electoralSystem]
+
+    CountryDetail:
+      allOf:
+        - $ref: "#/components/schemas/Country"
+        - type: object
+          properties:
+            votingAge:
+              type: integer
+            registrationDeadlineDays:
+              type: integer
+            idRequirements:
+              type: array
+              items:
+                type: string
+            votingProcess:
+              type: array
+              items:
+                type: string
+            overview:
+              type: string
+            keyFacts:
+              type: array
+              items:
+                type: string
+          required: [votingAge, registrationDeadlineDays, idRequirements, votingProcess, overview, keyFacts]
+
+    Election:
+      type: object
+      properties:
+        id:
+          type: string
+        countryId:
+          type: string
+        countryName:
+          type: string
+        countryFlag:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+          enum: [presidential, parliamentary, local, referendum, midterm]
+        date:
+          type: string
+        status:
+          type: string
+          enum: [upcoming, ongoing, completed]
+        description:
+          type: string
+      required: [id, countryId, countryName, countryFlag, title, type, date, status, description]
+
+    ElectionDetail:
+      allOf:
+        - $ref: "#/components/schemas/Election"
+        - type: object
+          properties:
+            results:
+              type: array
+              nullable: true
+              items:
+                $ref: "#/components/schemas/ElectionResult"
+            candidates:
+              type: array
+              items:
+                $ref: "#/components/schemas/Candidate"
+            turnout:
+              type: number
+              nullable: true
+            totalSeats:
+              type: integer
+              nullable: true
+          required: [candidates]
+
+    ElectionResult:
+      type: object
+      properties:
+        partyName:
+          type: string
+        partyColor:
+          type: string
+        voteShare:
+          type: number
+        seats:
+          type: integer
+          nullable: true
+      required: [partyName, partyColor, voteShare]
+
+    Candidate:
+      type: object
+      properties:
+        name:
+          type: string
+        party:
+          type: string
+        partyColor:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        description:
+          type: string
+      required: [name, party, partyColor, description]
+
+    UpcomingElectionsSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+        nextSevenDays:
+          type: integer
+        nextThirtyDays:
+          type: integer
+        featured:
+          type: array
+          items:
+            $ref: "#/components/schemas/Election"
+      required: [total, nextSevenDays, nextThirtyDays, featured]
+
+    ElectoralSystem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        abbreviation:
+          type: string
+        description:
+          type: string
+        countriesUsing:
+          type: integer
+        fairnessScore:
+          type: integer
+        simplicityScore:
+          type: integer
+        proportionalityScore:
+          type: integer
+        examples:
+          type: array
+          items:
+            type: string
+      required: [id, name, abbreviation, description, countriesUsing, fairnessScore, simplicityScore, proportionalityScore, examples]
+
+    ElectoralSystemDetail:
+      allOf:
+        - $ref: "#/components/schemas/ElectoralSystem"
+        - type: object
+          properties:
+            howItWorks:
+              type: array
+              items:
+                type: string
+            pros:
+              type: array
+              items:
+                type: string
+            cons:
+              type: array
+              items:
+                type: string
+            historyAndOrigin:
+              type: string
+          required: [howItWorks, pros, cons, historyAndOrigin]
+
+    SimulationRequest:
+      type: object
+      properties:
+        systemId:
+          type: string
+        totalSeats:
+          type: integer
+        parties:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              voteShare:
+                type: number
+              color:
+                type: string
+            required: [name, voteShare, color]
+        threshold:
+          type: number
+          default: 5
+      required: [systemId, totalSeats, parties]
+
+    SimulationResult:
+      type: object
+      properties:
+        systemId:
+          type: string
+        totalSeats:
+          type: integer
+        parties:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              voteShare:
+                type: number
+              seats:
+                type: integer
+              seatShare:
+                type: number
+              color:
+                type: string
+            required: [name, voteShare, seats, seatShare, color]
+        gallagherIndex:
+          type: number
+        summary:
+          type: string
+      required: [systemId, totalSeats, parties, gallagherIndex, summary]
+
+    ChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        sessionId:
+          type: string
+        mode:
+          type: string
+          enum: [standard, eli5, expert]
+          default: standard
+        countryContext:
+          type: string
+          nullable: true
+      required: [message, sessionId]
+
+    ChatResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        sources:
+          type: array
+          items:
+            type: string
+        confidence:
+          type: number
+        followUpSuggestions:
+          type: array
+          items:
+            type: string
+        sessionId:
+          type: string
+        createdAt:
+          type: string
+      required: [id, message, sources, confidence, followUpSuggestions, sessionId, createdAt]
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        confidence:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+      required: [id, sessionId, role, content, createdAt]
+
+    QuizQuestion:
+      type: object
+      properties:
+        id:
+          type: string
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        category:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, expert]
+        xpReward:
+          type: integer
+        explanation:
+          type: string
+      required: [id, question, options, category, difficulty, xpReward, explanation]
+
+    QuizAnswerRequest:
+      type: object
+      properties:
+        questionId:
+          type: string
+        selectedOption:
+          type: integer
+        sessionId:
+          type: string
+        timeTakenSeconds:
+          type: integer
+      required: [questionId, selectedOption, sessionId]
+
+    QuizAnswerResult:
+      type: object
+      properties:
+        correct:
+          type: boolean
+        correctOption:
+          type: integer
+        explanation:
+          type: string
+        xpEarned:
+          type: integer
+        streakBonus:
+          type: integer
+        newLevel:
+          type: string
+          nullable: true
+      required: [correct, correctOption, explanation, xpEarned, streakBonus]
+
+    LeaderboardEntry:
+      type: object
+      properties:
+        rank:
+          type: integer
+        sessionId:
+          type: string
+        displayName:
+          type: string
+        level:
+          type: string
+        xp:
+          type: integer
+        questionsAnswered:
+          type: integer
+        accuracy:
+          type: number
+      required: [rank, sessionId, displayName, level, xp, questionsAnswered, accuracy]
+
+    ClaimVerifyRequest:
+      type: object
+      properties:
+        claim:
+          type: string
+        context:
+          type: string
+          nullable: true
+        countryId:
+          type: string
+          nullable: true
+      required: [claim]
+
+    ClaimVerifyResult:
+      type: object
+      properties:
+        id:
+          type: string
+        claim:
+          type: string
+        verdict:
+          type: string
+          enum: [true, mostly-true, mixed, mostly-false, false, unverifiable]
+        confidence:
+          type: number
+        explanation:
+          type: string
+        sources:
+          type: array
+          items:
+            type: string
+        manipulationFlags:
+          type: array
+          items:
+            type: string
+        verifiedAt:
+          type: string
+      required: [id, claim, verdict, confidence, explanation, sources, manipulationFlags, verifiedAt]
+
+    NewsArticle:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        source:
+          type: string
+        sourceUrl:
+          type: string
+        biasRating:
+          type: string
+          enum: [left, center-left, center, center-right, right, unknown]
+        relevanceScore:
+          type: number
+        topic:
+          type: string
+        countryId:
+          type: string
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        publishedAt:
+          type: string
+      required: [id, title, summary, source, sourceUrl, biasRating, relevanceScore, topic, publishedAt]
+
+    UserProgress:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        displayName:
+          type: string
+        level:
+          type: string
+          enum: [beginner, civic-learner, analyst, policy-expert, democracy-champion]
+        xp:
+          type: integer
+        xpToNextLevel:
+          type: integer
+        questionsAnswered:
+          type: integer
+        correctAnswers:
+          type: integer
+        accuracy:
+          type: number
+        streak:
+          type: integer
+        countriesExplored:
+          type: integer
+        claimsVerified:
+          type: integer
+        chatInteractions:
+          type: integer
+        joinedAt:
+          type: string
+      required: [sessionId, displayName, level, xp, xpToNextLevel, questionsAnswered, correctAnswers, accuracy, streak, countriesExplored, claimsVerified, chatInteractions, joinedAt]
+
+    Achievement:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        category:
+          type: string
+          enum: [quiz, exploration, verification, chat, streak, special]
+        unlockedAt:
+          type: string
+      required: [id, name, description, icon, category, unlockedAt]
+
+    DashboardStats:
+      type: object
+      properties:
+        totalCountries:
+          type: integer
+        upcomingElections:
+          type: integer
+        questionsInDatabase:
+          type: integer
+        claimsVerified:
+          type: integer
+        electoralSystemsCovered:
+          type: integer
+        activeUsers:
+          type: integer
+        featuredElections:
+          type: array
+          items:
+            $ref: "#/components/schemas/Election"
+        recentClaims:
+          type: array
+          items:
+            $ref: "#/components/schemas/ClaimVerifyResult"
+      required: [totalCountries, upcomingElections, questionsInDatabase, claimsVerified, electoralSystemsCovered, activeUsers, featuredElections, recentClaims]
