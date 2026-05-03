@@ -1,5 +1,6 @@
 import app from "./app";
 import { logger } from "./lib/logger";
+import { initDb } from "@workspace/db";
 
 const rawPort = process.env["PORT"];
 
@@ -15,11 +16,14 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
+(async () => {
+  try {
+    await initDb();
+    app.listen(port, () => {
+      logger.info({ port }, "Server listening");
+    });
+  } catch (err) {
+    logger.error({ err }, "Failed to start server");
     process.exit(1);
   }
-
-  logger.info({ port }, "Server listening");
-});
+})();
