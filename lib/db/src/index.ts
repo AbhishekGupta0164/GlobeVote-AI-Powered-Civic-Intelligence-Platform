@@ -15,7 +15,7 @@ async function initDb() {
     const { drizzle } = await import("drizzle-orm/pglite");
     const { PGlite } = await import("@electric-sql/pglite");
     // Using a persistent path in the container if possible, or just in-memory
-    const client = new PGlite(); 
+    const client = new PGlite("memory://");
     db = drizzle(client, { schema });
     console.log("🏠 Using internal Standalone database (PGlite). Note: Data will not persist across restarts without DATABASE_URL.");
     
