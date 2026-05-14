@@ -33,6 +33,13 @@ RUN BASE_PATH=/ PORT=7860 NODE_ENV=production \
 # ── Build Express API server ───────────────────────────────────────────────
 RUN pnpm --filter @workspace/api-server run build
 
+# ── Copy PGlite WASM/data assets alongside the bundle ─────────────────────
+# PGlite resolves postgres.data and postgres.wasm relative to import.meta.url
+# (the bundle file), so they must be co-located in the dist directory.
+RUN PGLITE_DIST=$(find /app/node_modules -path "*/@electric-sql/pglite/dist" -type d | head -1) && \
+    cp "$PGLITE_DIST/postgres.data" /app/artifacts/api-server/dist/ && \
+    cp "$PGLITE_DIST/postgres.wasm" /app/artifacts/api-server/dist/
+
 # ── Production image ───────────────────────────────────────────────────────
 FROM node:20-slim AS runner
 
